@@ -1,0 +1,157 @@
+.interactive-panel{border-bottom:1px solid #dbe5eb;background:#fff}.interactive-toolbar,.drawing-toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 18px;background:#f6f9fb}.interactive-toolbar strong{margin-right:auto}.interactive-toolbar select{padding:5px 9px;font-size:13px}.interactive-panel button,.import-label{font:13px/1.5 inherit;font-size:13px;color:#355069;padding:6px 10px;border:1px solid #cbd8e0;border-radius:5px;background:#fff;cursor:pointer}.interactive-panel button:hover,.import-label:hover{background:#e9f1f7}.interactive-panel button.active{background:#e1edff;color:#2053a0;border-color:#5a83bd}.drawing-toolbar{border-top:1px solid #e4ebef;font-size:12px;gap:6px}.drawing-toolbar label{display:flex;align-items:center;gap:5px}.tool-separator{width:1px;height:20px;background:#ccd8e0;margin:0 4px}.import-file{display:none}.chart-legend{min-height:22px;padding:0 18px;font:12px/1.8 ui-monospace,monospace;color:#415c6c;white-space:normal}.chart-legend .ema20{color:#238197}.chart-legend .ema60{color:#c67d27}.chart-legend .ema200{color:#9852b3}.chart-host{height:670px;width:100%;position:relative;outline:none}.chart-host.daily{height:870px}.chart-host.expanded{height:85vh;min-height:720px}.chart-host.drawing{cursor:crosshair}.chart-placeholder{padding:70px;text-align:center;color:#7a8e9a}.drawing-status,.snapshot-note{font-size:12px;padding:0 18px;margin:8px 0;color:#5d7586}.static-fallback>summary{font-size:12px;padding:9px 18px}.static-fallback{background:#f7f9fb}.chart-attribution{font-size:12px;color:#627987}@media(max-width:700px){.chart-host{height:520px}.chart-host.daily{height:740px}.interactive-toolbar,.drawing-toolbar{padding:9px}.chart-legend{padding:0 10px}}@media print{.chart-host,.drawing-toolbar,.interactive-toolbar,.chart-legend,.drawing-status{display:none}.static-fallback{display:block}.static-fallback>summary{display:none}.static-fallback>.chart-panel{display:block}}
+/* Isolate the chart's layout table from the report's financial tables. */
+.chart-host table{width:auto;margin:0;border-collapse:collapse;background:transparent;font-size:12px}.chart-host td,.chart-host tr{padding:0;min-width:0;border:0;background:transparent}.chart-host td{vertical-align:top}
+/* All symbols remain visible across the full viewport width. */
+:root{--stock-nav-height:84px;--stock-scroll-offset:96px}
+body{padding-top:var(--stock-nav-height)}
+.stock-nav{position:fixed;inset:0 0 auto;z-index:100;display:grid;grid-template-columns:repeat(15,minmax(0,1fr));gap:4px;padding:7px 10px;background:#15354c;border-bottom:1px solid #466078;box-shadow:0 3px 12px #102b3d24}
+.stock-nav a{display:block;padding:5px 2px;text-align:center;text-decoration:none;font:600 13px/1.6 -apple-system,BlinkMacSystemFont,sans-serif;letter-spacing:.2px;color:#d7e6ef;border:1px solid transparent;border-radius:5px;white-space:nowrap}
+.stock-nav a:hover{background:#2a506a;color:white}.stock-nav a.active{background:#e6f4ff;color:#123e60;border-color:#9accec;box-shadow:inset 0 -2px #64b6e6}.stock-nav a:focus-visible{outline:2px solid #f5ce70;outline-offset:0}
+article{scroll-margin-top:var(--stock-scroll-offset)}
+@media(max-width:1100px){.stock-nav{grid-template-columns:repeat(10,minmax(0,1fr))}}
+@media(max-width:640px){.stock-nav{grid-template-columns:repeat(6,minmax(0,1fr));gap:2px;padding:5px}.stock-nav a{font-size:12px;padding:3px 1px}}
+@media print{.stock-nav{display:none}body{padding-top:0}}
+.chart-host{scroll-margin-top:calc(var(--stock-nav-height) + 12px)}
+
+.boundary-notes{padding:12px 22px;border-top:1px solid #e3eaf0;font-size:13px}.boundary-notes p{margin:8px 0}.boundary-notes td{min-width:100px}
+
+/* Compact chart layout: identity in the left gutter, no repeated footer controls. */
+main{max-width:1600px;padding-left:104px;padding-right:24px}
+article{overflow:visible}.stockhead{border-radius:14px 14px 0 0}
+.chart-stage{position:relative}.chart-side-label{position:absolute;left:-91px;top:26px;bottom:0;width:78px;color:#21485f;text-align:center;pointer-events:none}
+.chart-side-label>div{position:sticky;top:calc(var(--stock-nav-height) + 24px);display:flex;flex-direction:column;align-items:center;gap:7px;padding:10px 0}
+.chart-side-label strong{font-size:18px;line-height:1.3;letter-spacing:.3px}.chart-side-label span{font-size:13px;color:#617789}
+.drawing-status[hidden],.chart-print{display:none!important}.drawing-status:not([hidden]){padding:8px 18px;margin:0;color:#a03936;background:#fff3f1}
+@media(max-width:700px){main{padding-left:66px;padding-right:8px}.chart-side-label{left:-59px;width:50px;top:26px}.chart-side-label strong{font-size:12px;letter-spacing:0}.chart-side-label span{font-size:12px}}
+@media print{main{padding:0}.chart-stage,.drawing-toolbar,.drawing-status{display:none!important}.chart-print{display:block!important}}
+
+/* Latest saved price near an active sloping line; empty when no match. */
+.line-proximity{width:100%;margin-top:9px;pointer-events:auto;cursor:help}
+.line-proximity[hidden]{display:none!important}
+.near-line{display:flex;flex-direction:column;gap:3px;margin-bottom:13px;font-size:12px;line-height:1.5;color:#3c6480}
+.near-line b{font-size:12px;font-weight:600}.chart-side-label .near-line span{font-size:13px;color:inherit;font-variant-numeric:tabular-nums}.near-line small{font-size:11px;color:#617789}
+.near-line.upper{color:#a25454}.near-line.lower{color:#287969}
+@media(max-width:700px){.near-line b,.chart-side-label .near-line span{font-size:11px}.near-line small{font-size:10px}}
+
+.near-line.crossed{color:#94662b}
+
+/* Multi-line confluence: compact overview and distinct chart-side callouts. */
+.interactive-panel{scroll-margin-top:calc(var(--stock-nav-height) + 12px)}
+.confluence-overview{margin:0 0 30px;padding:22px 26px;background:#fff;border:1px solid #d9e4eb;border-radius:14px}
+.confluence-overview h2{margin:0;font-size:23px}.confluence-overview>p{font-size:13px;color:#607586;margin:6px 0 18px}
+.confluence-group h3{font-size:15px;margin:14px 0 9px}.confluence-empty{margin:0;font-size:13px;color:#697c88}
+.confluence-links{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px}
+.confluence-links a{display:flex;flex-direction:column;gap:2px;padding:10px 12px;background:#f2f7f8;border-radius:6px;text-decoration:none;line-height:1.5;font-size:12px;color:#32566a}
+.confluence-links a:hover{background:#e0f0ed}.confluence-links b{font-size:14px}.confluence-links small{color:#69808c;font-size:11px}
+.confluence-side{width:100%;pointer-events:auto;cursor:help}.confluence-side[hidden]{display:none!important}
+.confluence-side{max-height:min(520px,calc(100vh - var(--stock-nav-height) - 190px));min-height:0;overflow-y:auto;scrollbar-width:thin}
+.confluence-note{display:flex;flex-direction:column;gap:3px;padding:9px 0;margin-top:8px;border-top:2px solid #4b8d84;line-height:1.5;overflow-wrap:anywhere}
+.chart-side-label .confluence-note b{color:#226c65;font-size:12px}.chart-side-label .confluence-note strong{font-size:12px;letter-spacing:0;color:#285568}
+.chart-side-label .confluence-note span{font-size:11px}.confluence-note small{font-size:10px;color:#617789}
+.confluence-note.current{background:#e2f2ec;border-radius:3px}
+@media(max-width:700px){.confluence-overview{padding:14px}.confluence-links{grid-template-columns:1fr}.chart-side-label .confluence-note strong,.chart-side-label .confluence-note b{font-size:11px}}
+@media print{.confluence-overview{display:none}}
+
+.confluence-date{white-space:nowrap}.confluence-note.resistance{border-top-color:#ac4d62}.chart-side-label .confluence-note.resistance b{color:#ac4d62}.confluence-note.mixed{border-top-color:#7651aa}.chart-side-label .confluence-note.mixed b{color:#7651aa}
+@media(max-width:700px){.confluence-date{font-size:8px}}
+
+.drawing-toolbar button[data-tool="trend"]::before,.drawing-toolbar button[data-tool="support"]::before,.drawing-toolbar button[data-tool="gap"]::before{content:"";display:inline-block;width:20px;margin-right:6px;vertical-align:middle;border-top:2px solid #2563c3}
+.drawing-toolbar button[data-tool="support"]::before{height:9px;border:0;background:#77dd9940}
+.drawing-toolbar button[data-tool="gap"]::before{height:2px;border:0;background:repeating-linear-gradient(to right,#b77721 0 8px,transparent 8px 11px,#b77721 11px 13px,transparent 13px 17px)}
+
+.drawing-toolbar .delete-icon{display:inline-block;vertical-align:-3px;margin-right:5px;pointer-events:none}
+
+/* Clear outlines for drawing controls, including the selected tool. */
+.drawing-toolbar button,.drawing-toolbar button.active,.drawing-toolbar .import-label{border:2px solid #000}
+
+.drawing-toolbar button[data-tool="trend"]::before{border-top-style:dashed}
+
+.drawing-archive{margin:28px 0 12px;padding:18px;background:#f6f9fb;border-radius:8px}.archive-controls{display:flex;justify-content:center;gap:12px;flex-wrap:wrap}.drawing-archive button,.archive-import{font:inherit;font-size:14px;color:#355069;background:#fff;border:2px solid #000;border-radius:5px;padding:8px 14px;cursor:pointer}.drawing-archive button:hover,.archive-import:hover{background:#e9f1f7}.archive-import{position:relative}.archive-import input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer}.archive-import:focus-within{outline:2px solid #5a83bd;outline-offset:2px}.archive-status{font-size:13px;overflow-wrap:anywhere;margin:12px 0 0}.archive-status[hidden]{display:none}.drawing-archive[aria-busy="true"] .archive-import{pointer-events:none;opacity:.6}@media print{.drawing-archive{display:none}}
+
+/* Shared toolbar sits directly below the fixed stock navigation. */
+.global-drawing-toolbar{position:fixed;top:var(--stock-nav-only-height,84px);left:0;right:0;z-index:99;box-shadow:0 3px 8px #102b3d18}
+.global-drawing-toolbar button{font:13px/1.5 sans-serif;color:#355069;padding:6px 10px;border:2px solid #000;border-radius:5px;background:#fff;cursor:pointer}
+.global-drawing-toolbar button.active{background:#e1edff;color:#2053a0}.global-drawing-toolbar button:disabled{opacity:.4;cursor:default}
+.active-chart-label{min-width:110px;font-size:13px;color:#21485f}.active-chart .chart-side-label strong{color:#2563c3}
+@media print{.global-drawing-toolbar{display:none!important}}
+
+/* A symbol favorite is shared by its daily and weekly chart. */
+.chart-side-label .favorite-identity{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:3px;pointer-events:auto}
+.chart-side-label .favorite-toggle{display:inline-flex;align-items:center;justify-content:center;flex:none;width:25px;height:28px;padding:0;border:0;border-radius:5px;background:transparent;color:#617789;font:23px/1 sans-serif;cursor:pointer}
+.chart-side-label .favorite-toggle:hover{background:#dce8ef;color:#245a7c}
+.chart-side-label .favorite-toggle.active{background:transparent;color:#b87808}
+.chart-side-label .favorite-toggle:focus-visible{outline:2px solid #2563c3;outline-offset:1px}
+.stock-nav .favorites-empty{display:block;white-space:nowrap;color:#b9d5e6;font-size:13px;line-height:24px;padding:2px 9px}
+.stock-nav .favorite-status{margin:0;padding:4px 9px;color:#ffd4c8;font-size:12px}
+.stock-nav .favorite-status[hidden]{display:none}
+
+/* Chart-scoped controls: daily beside the symbol, weekly above its chart. */
+.chart-panel-header{display:flex;align-items:center;flex-wrap:wrap;gap:10px 22px;padding:12px 22px;background:#e5eff2;border-bottom:1px solid #dbe5eb}
+.chart-panel-header.daily-header{border-radius:14px 14px 0 0}
+.chart-panel-header.weekly-header{background:#f6f9fb}
+.chart-panel-header h2{margin:0;flex:0 0 auto;font-size:22px;line-height:1.5}
+.chart-panel-header.weekly-header h2{font-size:18px}
+.chart-panel-header .local-drawing-toolbar{position:static;display:flex;flex:1 1 auto;flex-wrap:wrap;gap:6px;padding:0;border:0;background:transparent;box-shadow:none}
+.local-drawing-toolbar button{font:13px/1.5 sans-serif;color:#355069;padding:6px 10px;border:2px solid #000;border-radius:5px;background:#fff;cursor:pointer}
+.local-drawing-toolbar button.active{background:#e1edff;color:#2053a0}
+@media(max-width:700px){.chart-panel-header{padding:10px;gap:8px 14px}.local-drawing-toolbar button{padding:5px 8px}}
+
+/* Measurement overlays the plot without entering the chart-managed canvas host. */
+.chart-plot-shell .side-measure{pointer-events:auto;flex:none;white-space:nowrap;font:13px/1.5 sans-serif;color:#355069;background:#fff;border:2px solid #000;border-radius:5px;padding:4px 6px;cursor:pointer;margin-top:3px}
+.chart-plot-shell .side-measure:hover{background:#e9f1f7}
+.chart-plot-shell .side-measure.active{background:#e1edff;color:#2053a0}
+.chart-plot-shell .side-measure:focus-visible{outline:2px solid #2563c3;outline-offset:2px}
+@media(max-width:700px){.chart-plot-shell .side-measure{font-size:11px;padding:3px 2px}}
+
+.chart-plot-shell{position:relative}
+.chart-plot-shell .side-measure{position:absolute;left:20px;top:20px;z-index:5;margin:0}
+
+/* Per-chart tools overlay the plot; empty space still lets the chart pan. */
+.chart-plot-shell .plot-drawing-controls{position:absolute;left:20px;right:80px;top:20px;z-index:5;display:flex;flex-direction:row;align-items:flex-start;gap:14px;pointer-events:none}
+.plot-drawing-controls .local-drawing-toolbar{position:static;display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:6px;padding:0;border:0;background:transparent;box-shadow:none;pointer-events:none}
+.plot-drawing-controls .local-drawing-toolbar button,.plot-drawing-controls .local-drawing-toolbar label{pointer-events:auto}
+.plot-drawing-controls .local-drawing-toolbar label{padding:4px 6px;border-radius:4px;background:#ffffffeb;color:#355069}
+.chart-plot-shell .plot-drawing-controls .side-measure{position:static;order:-1;align-self:flex-start;flex:none;margin:0;padding:6px 10px;font-size:13px;pointer-events:auto}
+.plot-drawing-controls .local-drawing-toolbar{flex:1 1 auto;min-width:0}
+@media(max-width:700px){.chart-plot-shell .plot-drawing-controls{right:64px;gap:12px}}
+@media print{.plot-drawing-controls{display:none}}
+
+.chart-panel-header .header-analysis{display:inline-flex;align-items:center;gap:6px;white-space:nowrap;color:#355069;font-size:13px;cursor:pointer}
+.chart-panel-header .header-analysis input{flex:none;margin:0;accent-color:#2563c3}
+
+/* Right controls share the OHLC row; measurement stays in the plot. */
+.chart-info-row{display:flex;align-items:center;gap:8px;background:#fff;min-width:0}
+.chart-info-row .chart-legend{flex:1 1 auto;min-width:0}
+.chart-info-row .local-drawing-toolbar{position:static;display:flex;align-items:center;justify-content:flex-end;flex:0 0 auto;flex-wrap:wrap;gap:6px;padding:4px 20px 4px 0;border:0;background:transparent;box-shadow:none}
+@media(max-width:1100px){.chart-info-row{flex-wrap:wrap}.chart-info-row .chart-legend{flex-basis:100%}.chart-info-row .local-drawing-toolbar{flex:1 1 auto;padding-left:18px}}
+
+.local-drawing-toolbar .toolbar-grip{touch-action:none;cursor:grab;user-select:none;padding:6px 7px;color:#617789;border-color:#aab9c4;font-size:16px;line-height:19px}
+.local-drawing-toolbar .toolbar-grip:active{cursor:grabbing}
+.chart-info-row .local-drawing-toolbar.movable-toolbar{position:absolute;z-index:8;max-width:100%;width:max-content;padding:5px;background:#f6f9fbef;border:1px solid #dbe5eb;border-radius:6px;box-shadow:0 2px 6px #18324920}
+
+.price-alerts{position:relative;font-size:13px;color:#355069}
+.price-alerts summary{cursor:pointer;color:#805394}
+.price-alert-list{position:absolute;top:100%;left:0;z-index:12;min-width:240px;max-height:260px;overflow:auto;padding:10px;background:#fff;border:1px solid #dbe5eb;border-radius:6px;box-shadow:0 3px 12px #18324925}
+.price-alert-list p{font-size:12px;margin:0 0 8px}
+.price-alert-list>div{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:3px 0}
+.price-alert-list button{padding:0 7px;cursor:pointer}
+
+/* A separate rail to the right of price digits, never on the scaling axis. */
+.chart-plot-shell{padding-right:30px}
+.price-alert-rail{position:absolute;right:0;top:0;width:30px;z-index:6;background:#faf7fc;border-left:1px solid #e7dced;cursor:crosshair}
+.price-alert-rail button{position:absolute;left:3px;width:24px;height:24px;padding:0;border:1px solid #c7acd3;border-radius:4px;background:#fff;color:#9053ac;font:18px/20px sans-serif;cursor:pointer}
+.price-alert-rail button[hidden]{display:none}
+.price-alert-rail .price-alert-remove{z-index:2;background:#f4eaf9}
+.price-alert-rail button:focus-visible{outline:2px solid #9053ac}
+
+.price-alert-rail{width:54px}.chart-plot-shell{padding-right:54px}.price-alert-rail .price-alert-remove{left:28px}.price-alert-rail .price-alert-handle{left:3px;color:#4285f4;cursor:ns-resize;touch-action:none}.price-alert-rail .price-alert-add{color:#4285f4}
+
+/* Alert handle sits outside the add/delete controls. */
+.price-alert-rail .price-alert-remove{left:3px}.price-alert-rail .price-alert-handle{left:28px}
+
+/* Saved alert price is the outermost draggable label. */
+.chart-plot-shell{padding-right:112px}.price-alert-rail{width:112px}.price-alert-rail .price-alert-handle{left:28px;width:80px;background:#a865c2;color:#fff;border:0;border-radius:3px;font-size:12px;white-space:nowrap}
+
+.price-alert-rail .price-alert-handle{position:absolute;height:24px;line-height:24px;text-align:center;cursor:default;touch-action:auto}
+
+.drawing-toolbar button[data-tool="fib"]::before{content:"";display:inline-block;width:18px;height:12px;margin-right:6px;vertical-align:middle;background:linear-gradient(to bottom,#697789 0 1px,transparent 1px 4px,#369579 4px 5px,transparent 5px 8px,#557bc1 8px 9px,transparent 9px 11px,#697789 11px)}
