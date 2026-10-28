@@ -55,6 +55,14 @@ function commitImport(entries,storage,backupKey,readMounted=()=>null){
 function annotationSignature(archive){
  return JSON.stringify(archive.charts.map(c=>({key:c.symbol+'|'+c.tf,drawings:c.drawings,hiddenAnalysis:c.hiddenAnalysis,analysisVisible:c.analysisVisible!==false})).sort((a,b)=>a.key.localeCompare(b.key)));
 }
+// Apply each published viewport revision once; subsequent local zoom remains local.
+function needsViewSync(current,incoming,baseline){
+ if(!incoming.charts.some(c=>c.view))return false;
+ if(baseline&&Date.parse(incoming.exportedAt)<Date.parse(baseline.exportedAt))return false;
+ if(baseline?.viewExportedAt&&Date.parse(incoming.exportedAt)<=Date.parse(baseline.viewExportedAt))return false;
+ const views=a=>JSON.stringify(a.charts.map(c=>({key:c.symbol+'|'+c.tf,view:c.view||null})).sort((a,b)=>a.key.localeCompare(b.key)));
+ return views(current)!==views(incoming);
+}
 function autoDecision(current,incoming,baseline){
  const local=annotationSignature(current),remote=annotationSignature(incoming);
  if(local===remote)return 'same';
@@ -62,13 +70,13 @@ function autoDecision(current,incoming,baseline){
  const dirty=baseline?local!==baseline.signature:current.charts.some(c=>c.drawings.length||c.hiddenAnalysis.length||c.analysisVisible===false);
  return dirty?'conflict':'import';
 }
-if(typeof module!=='undefined'&&module.exports){module.exports={collect,prepareImport,commitImport,annotationSignature,autoDecision};return;}
+if(typeof module!=='undefined'&&module.exports){module.exports={collect,prepareImport,commitImport,annotationSignature,autoDecision,needsViewSync};return;}
 const readers=new Map(),writers=new Map();root.ReportDrawingExport={register:(key,read,write)=>{readers.set(key,read);writers.set(key,write);},unregister:key=>{readers.delete(key);writers.delete(key);}};
 const report=decodeURIComponent(location.pathname.split('/').slice(-2,-1)[0]||'report'),storageKey=location.pathname;
 let directory=null,db=null,busy=false;
 const syncKey='paaa.annotation-sync.'+(root.REPORT_STORAGE_SCOPE||storageKey);
 function currentArchive(){return collect(root.REPORT_CHARTS,root.ReportDrawingState,key=>localStorage.getItem(key),key=>readers.get(key)?.(),root.REPORT_STORAGE_SCOPE||'',root.ReportViewport);}
-function rememberSync(archive){localStorage.setItem(syncKey,JSON.stringify({exportedAt:archive.exportedAt,signature:annotationSignature(archive)}));}
+function rememberSync(archive){localStorage.setItem(syncKey,JSON.stringify({exportedAt:archive.exportedAt,signature:annotationSignature(archive),viewExportedAt:archive.exportedAt}));}
 function applyArchive(archive,entries){
  commitImport(entries,localStorage,'paaa.before-import.'+storageKey,key=>readers.get(key)?.());
  let refreshFailed=false;
@@ -146,12 +154,12 @@ async function autoImportLatest(){
   for(const c of archive.charts){const data=root.REPORT_CHARTS[c.symbol+'|'+c.tf],codec=root.ReportDrawingState.create(data.rows,data.overlays);if(c.captured!==data.captured||JSON.stringify(c.originalAnalysis)!==JSON.stringify(codec.encode(codec.analysis.filter(d=>d.type!=='mark'))))throw Error('最新备份的行情或分析线版本与本月报不同，请手动核对后导入');}
   if(busy){message(statusTarget,'自动导入已跳过：正在导出或导入标注。');return;}
   let baseline=null;try{baseline=JSON.parse(localStorage.getItem(syncKey));}catch{}
-  const decision=autoDecision(currentArchive(),archive,baseline);
+  const current=currentArchive(),decision=autoDecision(current,archive,baseline);
   if(decision==='conflict'){message(statusTarget,'发现最新文件 '+name+'，但浏览器有未同步的标注，已保留当前修改；请先导出备份，再手动选择要导入的版本。');return;}
   if(decision==='older')return;
-  if(decision==='same'){if(!baseline||Date.parse(archive.exportedAt)>=Date.parse(baseline.exportedAt))rememberSync(archive);message(statusTarget,'已核对最新标注：'+name+'，与当前浏览器一致。');return;}
+  if(decision==='same'&&!needsViewSync(current,archive,baseline)){if(!baseline||Date.parse(archive.exportedAt)>=Date.parse(baseline.exportedAt))rememberSync(archive);message(statusTarget,'已核对最新标注：'+name+'，与当前浏览器一致。');return;}
   busy=true;
-  try{const failed=applyArchive(archive,entries);message(statusTarget,'已自动导入最新标注：'+name+'（'+entries.length+' 张图，导入前状态已备份）'+(failed?'；部分图表请刷新后查看。':''));}finally{busy=false;}
+  try{const failed=applyArchive(archive,entries);message(statusTarget,'已自动导入最新标注与缩放视图：'+name+'（'+entries.length+' 张图，导入前状态已备份）'+(failed?'；部分图表请刷新后查看。':''));}finally{busy=false;}
  }catch(err){message(statusTarget,'标注自动加载未完成：'+err.message+'。当前浏览器标注已保留。');}
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',autoImportLatest,{once:true});

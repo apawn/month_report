@@ -1,7 +1,7 @@
 {
   "format": "paaa-drawings-archive",
   "version": 1,
-  "exportedAt": "2026-10-28T05:22:41.317Z",
+  "exportedAt": "2026-10-28T05:52:58.405Z",
   "charts": [
     {
       "version": 1,
@@ -98079,13 +98079,6 @@
       ]
     }
   ],
-  "report": "month-9th",
-  "storageScope": "month-9th-2026-09",
-  "migration": {
-    "sourceFile": "标注/month-9th-全部画线-右侧本地-2026-10-28T05-16-56-375Z.json",
-    "sourceExportedAt": "2026-10-28T05:16:56.369Z",
-    "sourceSha256": "afdaf5ee9ce5a93ffcd9225c343d30adf532f5b5c2000aee0832204c8bfa05a9",
-    "reason": "Market snapshot refresh with validated date-axis rebasing. User edits are from the saved source archive; source was freshly exported from the report browser before collection.",
-    "unmatchedHistoricalIdentitiesRetained": 44
-  }
+  "report": "report",
+  "storageScope": "month-9th-2026-09"
 }
